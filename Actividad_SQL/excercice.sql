@@ -87,28 +87,66 @@ ORDER BY customer_name;
 
 --PARTE 3
 
+--3.1
 SELECT title
 FROM film
 WHERE title LIKE 'Q%' AND (SELECT language_id FROM language WHERE language_id=1);
 
-
+--3.2
 SELECT fi.title, ac.first_name, ac.last_name
 FROM actor ac
 INNER JOIN film_actor fa ON ac.actor_id=fa.actor_id
 INNER JOIN film fi ON fi.film_id=fa.film_id
 WHERE fi.title in (SELECT fi.title FROM film WHERE fi.title='ALONE TRIP');
 
-SELECT c.country cu.first_name, cu.last_name cu.email
-FROM customer
+--3.3
+SELECT c.country, cu.first_name, cu.last_name, cu.email
+FROM customer cu
 INNER JOIN address ad on cu.address_id=ad.address_id
 INNER JOIN city ON ad.city_id=city.city_id
 INNER JOIN country c on city.country_id=c.country_id
 WHERE c.country='Canada';
 
+--3.4
 
+SELECT title, rating
+FROM film
+WHERE rating='G';
 
+SELECT f.title, cat.name
+FROM category cat
+INNER JOIN film_category fic ON fic.category_id=cat.category_id
+INNER JOIN film f on f.film_id=fic.film_id
+WHERE cat.name='Family';
 
+--3.5
+SELECT f.film_id AS ID, f.title, count(f.film_id) AS number_of_copies
+FROM film f
+INNER JOIN inventory i on f.film_id=i.film_id
+GROUP BY f.title
+ORDER BY number_of_copies DESC;
 
+--3.6
+SELECT s.store_id, sum(p.amount) AS Business_Volume
+FROM store s
+INNER JOIN customer c ON s.store_id=c.store_id
+INNER JOIN payment p ON c.customer_id=p.customer_id
+GROUP BY s.store_id;
 
+--3,7
+SELECT s.store_id, ci.city, co.country
+FROM store s
+INNER JOIN address ad ON s.address_id=ad.address_id
+INNER JOIN city ci ON ad.city_id=ci.city_id
+INNER JOIN country co ON ci.country_id=co.country_id;
 
-
+SELECT cat.name, round(sum(p.amount),2) as Income, count(cat.name)
+FROM category cat
+INNER JOIN film_category fic ON cat.category_id=fic.category_id
+INNER JOIN film f ON fic.film_id=f.film_id
+INNER JOIN inventory i ON f.film_id=i.film_id
+INNER JOIN rental r ON i.inventory_id=r.inventory_id
+INNER JOIN payment p ON r.rental_id=p.rental_id
+GROUP BY cat.name
+ORDER BY Income DESC
+LIMIT 5;
